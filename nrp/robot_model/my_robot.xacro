@@ -1,0 +1,218 @@
+<robot name="my_robot">
+  <!-- <link name="world"/>
+
+  <joint name="joint0" type="planar">
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>
+    <parent link="world"/>
+    <child link="base_link"/>
+    <limit effort="30" velocity="1.0"/>
+  </joint> -->
+
+  <!-- the model -->
+  <link name="base_link">
+    <inertial>
+      <mass value="1000" />
+      <origin xyz="0 0 0.1" />
+      <inertia ixx="50.0" ixy="0.0" ixz="0.0" iyy="50.0" iyz="0.0" izz="50.0" />
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.1"/>
+      <geometry>
+        <box size="0.2 0.2 0.2" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.1"/>
+      <geometry>
+        <box size="0.2 0.2 0.2" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint1" type="continuous">
+    <origin rpy="0 1.57079632679 0" xyz="0 0 0.2"/>
+    <parent link="base_link"/>
+    <child link="arm_link1"/>
+    <!-- <limit lower="-2.095" upper="2.095" effort="30" velocity="1.0"/> -->
+  </joint>
+
+  <link name="arm_link1">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="1.67E-03" ixy="0" ixz="0" iyy="0.02166" iyz="0" izz="0.02166"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+        <!-- does not need to match collision -->
+      </geometry>
+      <material name="">
+        <color rgba="0 0 1 0.5"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint2" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.01 0.2 0"/>
+    <parent link="arm_link1"/>
+    <child link="arm_link2"/>
+    <!-- <limit effort="30" velocity="1.0"/> -->
+  </joint>
+
+  <link name="arm_link2">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="1.67E-03" ixy="0" ixz="0" iyy="0.02166" iyz="0" izz="0.02166"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+        <!-- does not need to match collision -->
+      </geometry>
+      <material name="">
+        <color rgba="0 0 1 0.5"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint3" type="continuous">
+    <origin rpy="0 0 0" xyz="0.01 0.2 0"/>
+    <parent link="arm_link2"/>
+    <child link="arm_link3"/>
+    <!-- <limit effort="30" velocity="1.0"/> -->
+  </joint>
+
+  <link name="arm_link3">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="1.67E-03" ixy="0" ixz="0" iyy="0.02166" iyz="0" izz="0.02166"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+        <!-- does not need to match collision -->
+      </geometry>
+      <material name="">
+        <color rgba="0 0 1 0.5"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint4" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.01 0.2 0"/>
+    <parent link="arm_link3"/>
+    <child link="arm_link4"/>
+    <!-- <limit effort="30" velocity="1.0"/> -->
+  </joint>
+
+  <link name="arm_link4">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="1.67E-03" ixy="0" ixz="0" iyy="0.02166" iyz="0" izz="0.02166"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+        <!-- does not need to match collision -->
+      </geometry>
+      <material name="">
+        <color rgba="0 0 1 0.5"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint5" type="continuous">
+    <origin rpy="0 0 0" xyz="0.01 0.2 0"/>
+    <parent link="arm_link4"/>
+    <child link="arm_link5"/>
+    <!-- <limit effort="30" velocity="1.0"/> -->
+  </joint>
+
+  <link name="arm_link5">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="1.67E-03" ixy="0" ixz="0" iyy="0.02166" iyz="0" izz="0.02166"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+        <!-- does not need to match collision -->
+      </geometry>
+      <material name="">
+        <color rgba="0 0 1 0.5"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="joint6" type="continuous">
+    <origin rpy="0 0 0" xyz="-0.01 0.2 0"/>
+    <parent link="arm_link5"/>
+    <child link="arm_link6"/>
+    <!-- <limit effort="30" velocity="1.0"/> -->
+  </joint>
+
+  <link name="arm_link6">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="1.67E-03" ixy="0" ixz="0" iyy="0.02166" iyz="0" izz="0.02166"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+        <!-- does not need to match collision -->
+      </geometry>
+      <material name="">
+        <color rgba="0 0 1 0.5"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.005 0.1 0"/>
+      <geometry>
+        <box size="0.01 0.2 0.1" />
+      </geometry>
+    </collision>
+  </link>
+
+</robot>

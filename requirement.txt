@@ -1,0 +1,16 @@
+numpy
+scikit-learn
+scikit-image
+matplotlib
+networkx
+reeds-shepp
+pybullet
+trimesh
+pyyaml
+pygccxml
+pyplusplus
+tensorboard
+lxml
+pytorch3d
+
+-e third_party/pytorch_kinematics
