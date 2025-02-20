@@ -1,4 +1,0 @@
-einops==0.7.0
-open3d==0.17.0
-toolz==0.12.1
-torch_geometric==2.4.0

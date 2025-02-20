@@ -32,7 +32,9 @@ If you find this work useful or interesting, please kindly give us a star ⭐, t
 
 Create conda environment with python 3.8
 
-```python
+```bash
+conda install pytorch torchvision pytorch-cuda -c pytorch -c nvidia
+conda install pytorch3d -c pytorch3d
 pip install -r requirements.txt
 ```
 
