@@ -29,8 +29,9 @@ Constants
 Env utils
 """
 
+
 def get_occ_grid(env_dir):
-    with open(os.path.join(CUR_DIR, "map/rls_occ_grid.npy"), "rb") as f:
+    with open(os.path.join(CUR_DIR, "map/occ_grid.npy"), "rb") as f:
         occ_grid = np.load(f)
 
     return occ_grid
@@ -42,7 +43,8 @@ def get_prm(env_dir):
 
 
 def get_mesh_path(env_dir):
-    return osp.join(CUR_DIR, "map/rls_mesh_v2.obj")
+    return osp.join(CUR_DIR, "map/rls_mesh.obj")
+
 
 def get_start_goal(env_dir):
     with open(osp.join(env_dir, "test_path.json"), "r") as f:
@@ -50,12 +52,15 @@ def get_start_goal(env_dir):
 
     return start_goal
 
+
 """
 Path Utils
 """
 
 
-def rrt_extend_path(env, path, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS, intermediate=False):
+def rrt_extend_path(
+    env, path, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS, intermediate=False
+):
     final_path = [path[0]]
     for i in range(1, len(path)):
         v1 = path[i - 1]
@@ -78,7 +83,9 @@ def rrt_extend(maze, v, g, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS):
     node1_pos = np.array(v)
 
     node1_pos_arm = node1_pos[3:]
-    base_traj, arm_step_size, num_points_per_edge = discretize_edge(v, g, step_size, turning_radius)
+    base_traj, arm_step_size, num_points_per_edge = discretize_edge(
+        v, g, step_size, turning_radius
+    )
 
     res_path = [node1_pos.tolist()]
     nodepos = np.zeros(len(node1_pos))
@@ -100,11 +107,15 @@ def rrt_extend(maze, v, g, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS):
     return res_path
 
 
-def rrt_extend_intermediate(maze, v, g, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS):
+def rrt_extend_intermediate(
+    maze, v, g, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS
+):
     node1_pos = np.array(v)
     node2_pos = np.array(g)
     node1_pos_arm = node1_pos[3:]
-    base_traj, arm_step_size, num_points_per_edge = discretize_edge(v, g, step_size, turning_radius)
+    base_traj, arm_step_size, num_points_per_edge = discretize_edge(
+        v, g, step_size, turning_radius
+    )
 
     res_path = [node1_pos.tolist()]
     nodepos = np.zeros(len(node1_pos))
@@ -125,7 +136,10 @@ def rrt_extend_intermediate(maze, v, g, step_size=STEP_SIZE, turning_radius=TURN
 
     return res_path
 
-def expand_until_local_env_edge(v, g, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS, local_env_size=2.0):
+
+def expand_until_local_env_edge(
+    v, g, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS, local_env_size=2.0
+):
     path = interpolate([v, g], step_size=step_size)
     for i, p in enumerate(path):
         if not is_robot_within_local_env(p, v, local_env_size):
@@ -134,7 +148,9 @@ def expand_until_local_env_edge(v, g, step_size=STEP_SIZE, turning_radius=TURNIN
     return g
 
 
-def is_edge_free(maze, node1_state, node2_state, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS):
+def is_edge_free(
+    maze, node1_state, node2_state, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS
+):
     node1_pos = np.array(node1_state)
     node2_pos = np.array(node2_state)
 
@@ -148,7 +164,9 @@ def is_edge_free(maze, node1_state, node2_state, step_size=STEP_SIZE, turning_ra
         return True
 
     node1_pos_arm = node1_pos[3:]
-    base_traj, arm_step_size, num_points_per_edge = discretize_edge(node1_pos, node2_pos, step_size, turning_radius)
+    base_traj, arm_step_size, num_points_per_edge = discretize_edge(
+        node1_pos, node2_pos, step_size, turning_radius
+    )
 
     # assert(np.max(step) < step_size and np.min(step) > -step_size)
     nodepos = np.zeros(len(node1_pos))
@@ -172,7 +190,9 @@ def calc_edge_len(s1, s2, turning_radius=TURNING_RADIUS, arm_len_weight=0.125):
     # we can't calculate rs_length in parallel unfortunately
     base_len = np.zeros((node1_pos_base.shape[0]))
     for i in range(node1_pos_base.shape[0]):
-        base_len[i] = rs.path_length(node1_pos_base[i], node2_pos_base[0], turning_radius)
+        base_len[i] = rs.path_length(
+            node1_pos_base[i], node2_pos_base[0], turning_radius
+        )
     # base_len = math.sqrt(float(np.sum((node1_pos_base-node2_pos_base)**2)))
     arm_len = np.linalg.norm((node2_pos_arm - node1_pos_arm), axis=-1)
     res = base_len + arm_len_weight * arm_len
@@ -194,7 +214,9 @@ def calc_edge_len_norm(s1, s2, turning_radius=TURNING_RADIUS, arm_len_weight=0.1
     # we can't calculate rs_length in parallel unfortunately
     base_len = np.zeros((node1_pos_base.shape[0]))
     for i in range(node1_pos_base.shape[0]):
-        base_len[i] = rs.path_length(node1_pos_base[i], node2_pos_base[0], turning_radius)
+        base_len[i] = rs.path_length(
+            node1_pos_base[i], node2_pos_base[0], turning_radius
+        )
     # base_len = math.sqrt(float(np.sum((node1_pos_base-node2_pos_base)**2)))
     arm_len = np.linalg.norm((node2_pos_arm - node1_pos_arm), axis=-1)
     res = np.linalg.norm((base_len, arm_len_weight * arm_len), axis=0)
@@ -217,7 +239,9 @@ def calc_edge_len_max(s1, s2, turning_radius=TURNING_RADIUS):
     # we can't calculate rs_length in parallel unfortunately
     base_len = np.zeros((node1_pos_base.shape[0]))
     for i in range(node1_pos_base.shape[0]):
-        base_len[i] = rs.path_length(node1_pos_base[i], node2_pos_base[0], turning_radius)
+        base_len[i] = rs.path_length(
+            node1_pos_base[i], node2_pos_base[0], turning_radius
+        )
     # base_len = math.sqrt(float(np.sum((node1_pos_base-node2_pos_base)**2)))
     arm_len = np.max(np.abs((node2_pos_arm - node1_pos_arm)), axis=-1)
     res = np.max((base_len, arm_len), axis=0)
@@ -250,7 +274,9 @@ def calc_path_len_norm(path, turning_radius=TURNING_RADIUS, arm_len_weight=0.125
     for i, node in enumerate(path):
         if i == 0:
             continue
-        length += calc_edge_len_norm(path[i - 1], node, turning_radius, arm_len_weight).item()
+        length += calc_edge_len_norm(
+            path[i - 1], node, turning_radius, arm_len_weight
+        ).item()
 
     return length
 
@@ -275,7 +301,9 @@ def calc_path_len_base(path, turning_radius=TURNING_RADIUS):
     return length
 
 
-def interpolate(path, step_size=STEP_SIZE, num_points_per_edge=None, turning_radius=TURNING_RADIUS):
+def interpolate(
+    path, step_size=STEP_SIZE, num_points_per_edge=None, turning_radius=TURNING_RADIUS
+):
     new_path = []
     # print(path)
     for i in range(1, len(path)):
@@ -283,7 +311,9 @@ def interpolate(path, step_size=STEP_SIZE, num_points_per_edge=None, turning_rad
         node2_pos = np.array(path[i])
 
         node1_pos_arm = node1_pos[3:]
-        base_traj, arm_step_size, num_points_per_edge = discretize_edge(node1_pos, node2_pos, step_size, turning_radius)
+        base_traj, arm_step_size, num_points_per_edge = discretize_edge(
+            node1_pos, node2_pos, step_size, turning_radius
+        )
 
         nodepos = np.zeros(len(node1_pos))
         for j in range(num_points_per_edge):
@@ -296,7 +326,9 @@ def interpolate(path, step_size=STEP_SIZE, num_points_per_edge=None, turning_rad
     return new_path
 
 
-def interpolate_base(path, step_size=0.2, num_points_per_edge=None, turning_radius=TURNING_RADIUS):
+def interpolate_base(
+    path, step_size=0.2, num_points_per_edge=None, turning_radius=TURNING_RADIUS
+):
     new_path = []
     # print(path)
     for i in range(1, len(path)):
@@ -312,7 +344,9 @@ def interpolate_base(path, step_size=0.2, num_points_per_edge=None, turning_radi
         base_diff = rs.path_length(node1_pos_base, node2_pos_base, turning_radius)
         num_points_per_edge = math.ceil(np.max(np.abs(base_diff)) / step_size) + 1
         base_step_size = base_diff / (num_points_per_edge - 1)
-        base_traj = rs_path_sample(node1_pos_base, node2_pos_base, turning_radius, base_step_size)
+        base_traj = rs_path_sample(
+            node1_pos_base, node2_pos_base, turning_radius, base_step_size
+        )
         if not np.allclose(base_traj[-1][:3], node2_pos_base):
             if len(base_traj) < num_points_per_edge:
                 base_traj.append(node2_pos_base)
@@ -386,7 +420,9 @@ def discretize_edge(v, g, step_size=STEP_SIZE, turning_radius=TURNING_RADIUS):
     if base_diff == 0:
         base_traj = [node1_pos_base] * num_points_per_edge
     else:
-        base_traj = rs_path_sample(node1_pos_base, node2_pos_base, turning_radius, base_step_size)
+        base_traj = rs_path_sample(
+            node1_pos_base, node2_pos_base, turning_radius, base_step_size
+        )
         if not np.allclose(base_traj[-1][:3], node2_pos_base):
             if len(base_traj) < num_points_per_edge:
                 base_traj.append(node2_pos_base)
@@ -422,7 +458,9 @@ def enforce_pi(theta):
 def rs_path_sample(node1_pos_base, node2_pos_base, turning_radius, base_step_size):
     # if node2_pos_base[2] < 0:
     #     node2_pos_base[2] += 2 * math.pi
-    base_traj = rs.path_sample(node1_pos_base, node2_pos_base, turning_radius, base_step_size)
+    base_traj = rs.path_sample(
+        node1_pos_base, node2_pos_base, turning_radius, base_step_size
+    )
     # base_traj = [list(t)[:3] for t in base_traj]
     res_base_traj = []
     for t in base_traj:
@@ -459,11 +497,17 @@ def get_free_nodes(G):
 
 
 def get_free_node_poss(G):
-    return [state_to_numpy(G.nodes[node]["coords"]) for node in G.nodes() if not G.nodes[node]["col"]]
+    return [
+        state_to_numpy(G.nodes[node]["coords"])
+        for node in G.nodes()
+        if not G.nodes[node]["col"]
+    ]
 
 
 def calculate_stats(true_pos, true_neg, false_pos, false_neg):
-    accuracy = float(true_pos + true_neg) / (true_pos + true_neg + false_pos + false_neg)
+    accuracy = float(true_pos + true_neg) / (
+        true_pos + true_neg + false_pos + false_neg
+    )
     if true_pos + false_pos > 0:
         precision = float(true_pos) / (true_pos + false_pos)
     else:
@@ -540,9 +584,13 @@ def visualize_nodes_global(
 
     if len(curr_node_posns) > 0:
         for i, pos in enumerate(curr_node_posns):
-            if sample_pos is not None and np.allclose(np.array(pos), np.array(sample_pos)):
+            if sample_pos is not None and np.allclose(
+                np.array(pos), np.array(sample_pos)
+            ):
                 continue
-            if start_pos is not None and np.allclose(np.array(pos), np.array(start_pos)):
+            if start_pos is not None and np.allclose(
+                np.array(pos), np.array(start_pos)
+            ):
                 continue
             if goal_pos is not None and np.allclose(np.array(pos), np.array(goal_pos)):
                 continue
@@ -554,7 +602,11 @@ def visualize_nodes_global(
             edge_path = curr_node_posns
 
         for i in range(1, len(edge_path)):
-            env.add_line(edge_path[i - 1][:2], edge_path[i][:2], colour=[102 / 255, 178 / 255, 255 / 255, 1])
+            env.add_line(
+                edge_path[i - 1][:2],
+                edge_path[i][:2],
+                colour=[102 / 255, 178 / 255, 255 / 255, 1],
+            )
 
     if start_pos is not None:
         start_pos_tmp = start_pos.copy()
@@ -581,7 +633,16 @@ def visualize_nodes_global(
         input("Press anything to quit")
 
 
-def visualize_nodes_global_2(mesh, occ_g, curr_node_posns, start_pos, goal_pos, show=True, save=False, file_name=None):
+def visualize_nodes_global_2(
+    mesh,
+    occ_g,
+    curr_node_posns,
+    start_pos,
+    goal_pos,
+    show=True,
+    save=False,
+    file_name=None,
+):
     from env.fetch_11d.maze import Fetch11DEnv
 
     # Image from side.
@@ -622,7 +683,15 @@ def visualize_nodes_global_2(mesh, occ_g, curr_node_posns, start_pos, goal_pos, 
 
 
 def visualize_nodes_local(
-    occ_g, cur_node_pos, start_pos, goal_pos, max_num=50, color_coding=False, show=True, save=False, file_name=None
+    occ_g,
+    cur_node_pos,
+    start_pos,
+    goal_pos,
+    max_num=50,
+    color_coding=False,
+    show=True,
+    save=False,
+    file_name=None,
 ):
     from env.fetch_11d.maze import Fetch11DEnv
 
@@ -642,7 +711,15 @@ def visualize_nodes_local(
                     pos_tmp = pos.copy()
                     pos_tmp[0] += 2
                     pos_tmp[1] += 2
-                    maze.add_robot(pos_tmp, rgba=[0 + i * color_step, 0 + i * color_step, 0 + i * color_step, 1])
+                    maze.add_robot(
+                        pos_tmp,
+                        rgba=[
+                            0 + i * color_step,
+                            0 + i * color_step,
+                            0 + i * color_step,
+                            1,
+                        ],
+                    )
         else:
             for pos in cur_node_pos:
                 if not np.allclose(pos, start_pos):
@@ -735,7 +812,15 @@ def visualize_distributions(
         angle = np.degrees(np.arctan2(*eigenvectors[:, 0][::-1]))
         width, height = 2 * np.sqrt(5.991 * eigenvalues)  # 95% confidence interval
         color = cm(i / len(search_dist_mu))
-        ellipse = Ellipse(xy=mu, width=width, height=height, angle=angle, edgecolor=color, lw=2, fill=False)
+        ellipse = Ellipse(
+            xy=mu,
+            width=width,
+            height=height,
+            angle=angle,
+            edgecolor=color,
+            lw=2,
+            fill=False,
+        )
         plt.gca().add_patch(ellipse)
 
     if start_pos is not None:
@@ -834,7 +919,15 @@ def visualize_tree(
 
 
 def visualize_tree_simple(
-    occ_g, G, start_pos, goal_pos, draw_col_edges=False, show=True, save=False, file_name=None, string=False
+    occ_g,
+    G,
+    start_pos,
+    goal_pos,
+    draw_col_edges=False,
+    show=True,
+    save=False,
+    file_name=None,
+    string=False,
 ):
     occ_g = occ_g[:, :, 0]  # compress to 2d
     fig1 = plt.figure(figsize=(10, 10), dpi=100)
@@ -846,7 +939,14 @@ def visualize_tree_simple(
     for i in range(occ_g.shape[0]):
         for j in range(occ_g.shape[1]):
             if occ_g[i, j] == 1:
-                plt.scatter((i + 0.5) * 0.1, (j + 0.5) * 0.1, color="black", marker="s", s=s**2, alpha=1)  # init
+                plt.scatter(
+                    (i + 0.5) * 0.1,
+                    (j + 0.5) * 0.1,
+                    color="black",
+                    marker="s",
+                    s=s**2,
+                    alpha=1,
+                )  # init
 
     # visualize node base positions
     # nodes = list(G.nodes())
@@ -893,11 +993,17 @@ def visualize_robot(robot_state, start=False, goal=False, mu=False, ax=None, s=1
     base_x, base_y = robot_state[:2]
 
     if start:
-        plt.scatter(base_x, base_y, color="yellow", marker="s", s=base_marker_size*2, alpha=1)  # init
+        plt.scatter(
+            base_x, base_y, color="yellow", marker="s", s=base_marker_size * 2, alpha=1
+        )  # init
     elif goal:
-        plt.scatter(base_x, base_y, color="red", marker="s", s=base_marker_size*2, alpha=1)  # init
+        plt.scatter(
+            base_x, base_y, color="red", marker="s", s=base_marker_size * 2, alpha=1
+        )  # init
     else:
-        plt.scatter(base_x, base_y, color="green", marker="s", s=base_marker_size, alpha=1)  # init
+        plt.scatter(
+            base_x, base_y, color="green", marker="s", s=base_marker_size, alpha=1
+        )  # init
 
 
 """
@@ -1022,26 +1128,36 @@ def get_local_center(r_state, g_size):
 
 def is_robot_outside_local_env(cur_state, state, env_size):
     # Fetch robot radius ~= 0.25
-    if math.fabs(state[0] - cur_state[0]) < env_size + 0.25 or math.fabs(state[1] - cur_state[1]) < env_size + 0.25:
+    if (
+        math.fabs(state[0] - cur_state[0]) < env_size + 0.25
+        or math.fabs(state[1] - cur_state[1]) < env_size + 0.25
+    ):
         return False
 
     # check linkpos
     state = torch.tensor(state).view(1, -1)
     linkpos = global_fk.get_link_positions(state).numpy().reshape(-1, 3)[:, :2]
     relative_linkpos = np.absolute(linkpos - cur_state[:2])
-    return (relative_linkpos[:, 0] > env_size).all() and (relative_linkpos[:, 1] > env_size).all()
+    return (relative_linkpos[:, 0] > env_size).all() and (
+        relative_linkpos[:, 1] > env_size
+    ).all()
 
 
 def is_robot_within_local_env(cur_state, state, env_size):
     # Fetch robot radius ~= 0.25
-    if math.fabs(state[0] - cur_state[0]) > env_size - 0.25 or math.fabs(state[1] - cur_state[1]) > env_size - 0.25:
+    if (
+        math.fabs(state[0] - cur_state[0]) > env_size - 0.25
+        or math.fabs(state[1] - cur_state[1]) > env_size - 0.25
+    ):
         return False
 
     # check linkpos
     state = torch.tensor(state).view(1, -1)
     linkpos = global_fk.get_link_positions(state).numpy().reshape(-1, 3)[:, :2]
     relative_linkpos = np.absolute(linkpos - cur_state[:2])
-    return (relative_linkpos[:, 0] < env_size).all() and (relative_linkpos[:, 1] < env_size).all()
+    return (relative_linkpos[:, 0] < env_size).all() and (
+        relative_linkpos[:, 1] < env_size
+    ).all()
 
 
 def get_last_waypoint_within_local_env(cur_pos, target_pos, local_env_size=2.0):
@@ -1095,9 +1211,14 @@ def get_voxel_and_feat(occ_grid):
 
 
 def add_pos_channels(occ_grid):
-    occ_grid_tmp = torch.zeros((4, occ_grid.shape[0], occ_grid.shape[1], occ_grid.shape[2]), device=occ_grid.device)
+    occ_grid_tmp = torch.zeros(
+        (4, occ_grid.shape[0], occ_grid.shape[1], occ_grid.shape[2]),
+        device=occ_grid.device,
+    )
 
-    voxel_coords = torch.from_numpy(np.indices((occ_grid.shape[2], occ_grid.shape[1], occ_grid.shape[0])).T)
+    voxel_coords = torch.from_numpy(
+        np.indices((occ_grid.shape[2], occ_grid.shape[1], occ_grid.shape[0])).T
+    )
     # print(voxel_coords)
 
     occ_grid_tmp[0, :, :, :] = occ_grid
@@ -1110,8 +1231,12 @@ def add_pos_channels(occ_grid):
 
 
 def add_pos_channels_np(occ_grid: np.ndarray) -> np.ndarray:
-    occ_grid_tmp = np.zeros((4, occ_grid.shape[0], occ_grid.shape[1], occ_grid.shape[2]))
-    voxel_coords = np.indices((occ_grid.shape[2], occ_grid.shape[1], occ_grid.shape[0])).T
+    occ_grid_tmp = np.zeros(
+        (4, occ_grid.shape[0], occ_grid.shape[1], occ_grid.shape[2])
+    )
+    voxel_coords = np.indices(
+        (occ_grid.shape[2], occ_grid.shape[1], occ_grid.shape[0])
+    ).T
     # print(voxel_coords)
 
     occ_grid_tmp[0, :, :, :] = occ_grid
@@ -1133,7 +1258,9 @@ def get_pc_from_voxel(occ_grid, desired_num_points=2048):
         choices = np.random.choice(num_points, desired_num_points, replace=True)
         indices = indices[choices]
     elif num_points < desired_num_points:
-        choices = np.random.choice(num_points, desired_num_points - num_points, replace=True)
+        choices = np.random.choice(
+            num_points, desired_num_points - num_points, replace=True
+        )
         indices = torch.cat((indices, indices[choices]))
     else:
         choices = np.random.choice(num_points, desired_num_points, replace=False)
@@ -1180,7 +1307,8 @@ class FkTorch:
         self.d = device
         self.dtype = torch.float
         chain = pk.build_serial_chain_from_urdf(
-            open(osp.join(CUR_DIR, "../../robot_model/fetch.urdf")).read(), "gripper_link"
+            open(osp.join(CUR_DIR, "../../robot_model/fetch.urdf")).read(),
+            "gripper_link",
         )
         self.chain = chain.to(dtype=self.dtype, device=self.d)
 
@@ -1196,9 +1324,13 @@ class FkTorch:
         # we want to forward the base offset but inverse the rotation. So we pass in the negative base offset
         bs = robot_state.shape[0]
         base_offset = torch.zeros((bs, 3), dtype=self.dtype, device=self.d)
-        base_offset[:, :2] = robot_state[:, :2]  # So we pass in the negative base offset
+        base_offset[:, :2] = robot_state[
+            :, :2
+        ]  # So we pass in the negative base offset
         transform3d = Transform3d(dtype=self.dtype, device=self.d)
-        transform3d = transform3d.rotate_axis_angle(robot_state[:, 2], axis="Z", degrees=False).translate(base_offset)
+        transform3d = transform3d.rotate_axis_angle(
+            robot_state[:, 2], axis="Z", degrees=False
+        ).translate(base_offset)
         # print(transform3d.get_matrix())
 
         # order of magnitudes faster when doing FK in parallel
@@ -1251,15 +1383,31 @@ def get_ebsa_path(occ_grid, start_pos, target_pos):
 
     robot_height = 1.1
     occ_grid_resolution = 0.1
-    occ_grid_2d = np.any(occ_grid[:, :, : int(robot_height / occ_grid_resolution)], axis=2).astype(int)
-    astar_start = (start_pos[0] / occ_grid_resolution, start_pos[1] / occ_grid_resolution, start_pos[2])
-    astar_goal = (target_pos[0] / occ_grid_resolution, target_pos[1] / occ_grid_resolution, target_pos[2])
-    astar_path, plan_time = base_expert_planner.plan(astar_start, astar_goal, occ_grid_2d, timeout=30)
+    occ_grid_2d = np.any(
+        occ_grid[:, :, : int(robot_height / occ_grid_resolution)], axis=2
+    ).astype(int)
+    astar_start = (
+        start_pos[0] / occ_grid_resolution,
+        start_pos[1] / occ_grid_resolution,
+        start_pos[2],
+    )
+    astar_goal = (
+        target_pos[0] / occ_grid_resolution,
+        target_pos[1] / occ_grid_resolution,
+        target_pos[2],
+    )
+    astar_path, plan_time = base_expert_planner.plan(
+        astar_start, astar_goal, occ_grid_2d, timeout=30
+    )
     if astar_path is not None:
         expert_base_path = []
         for i in range(len(astar_path[0])):
             expert_base_path.append(
-                [astar_path[0][i] * occ_grid_resolution, astar_path[1][i] * occ_grid_resolution, astar_path[2][i]]
+                [
+                    astar_path[0][i] * occ_grid_resolution,
+                    astar_path[1][i] * occ_grid_resolution,
+                    astar_path[2][i],
+                ]
             )
 
         num_waypoints = len(expert_base_path)
