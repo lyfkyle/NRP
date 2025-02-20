@@ -30,6 +30,19 @@ If you find this work useful or interesting, please kindly give us a star ⭐, t
 
 # Installation
 
+Install system dependencies first.
+
+```
+sudo apt-get install libboost-all-dev
+```
+
+Download prebuild python wheel for OMPL
+
+```
+wget https://github.com/ompl/ompl/releases/download/prerelease/ompl-1.6.0-cp310-cp310-manylinux_2_28_x86_64.whl
+pip install ompl-1.6.0-cp310-cp310-manylinux_2_28_x86_64.whl
+```
+
 Create conda environment with python 3.8
 
 ```bash
