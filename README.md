@@ -84,7 +84,7 @@ To repeat the experiment reported in paper, run the following scripts
 
 ```python
 cd nrp/test
-python test_planning_performance.py --planner nrp_g
+python test_planning_performance_time.py --planner nrp_g
 ```
 
 This will run the planner on all 250 environments for a total of 10 times and report the aggregated results.
