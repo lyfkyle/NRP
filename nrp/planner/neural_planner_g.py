@@ -53,9 +53,13 @@ class NRP_g:
 
     def _init_sampler(self, env, occ_grid_dim, model_path, device):
         if env.name == "snake_8d":
-            self.sampler = LocalNeuralExpander8D(env, self.dim, occ_grid_dim, model_path, device=device, global_mode=False)
+            self.sampler = LocalNeuralExpander8D(
+                env, self.dim, occ_grid_dim, model_path, device=device, global_mode=False
+            )
         elif env.name == "fetch_11d":
-            self.sampler = LocalNeuralExpander11D(env, self.dim, occ_grid_dim, model_path, device=device, global_mode=False)
+            self.sampler = LocalNeuralExpander11D(
+                env, self.dim, occ_grid_dim, model_path, device=device, global_mode=False
+            )
 
     def clear(self):
         self.env = None
@@ -94,7 +98,7 @@ class NRP_g:
 
         return path
 
-    def solve_step_extension(self, env, start, goal, max_extensions, step_size=50, mesh=None):
+    def solve_step_expansion(self, env, start, goal, max_extensions, step_size=50, mesh=None):
         self.clear()
         self.algo.clear()
         self.algo.env = env
@@ -369,12 +373,17 @@ class NRP_g:
 
     #     return goal_pos[:2]
 
+
 class NRPGlobal_g(NRP_g):
     def _init_sampler(self, env, occ_grid_dim, model_path, device):
         if env.name == "snake_8d":
-            self.sampler = LocalNeuralExpander8D(env, self.dim, occ_grid_dim, model_path, device=device, global_mode=True)
+            self.sampler = LocalNeuralExpander8D(
+                env, self.dim, occ_grid_dim, model_path, device=device, global_mode=True
+            )
         elif env.name == "fetch_11d":
-            self.sampler = LocalNeuralExpander11D(env, self.dim, occ_grid_dim, model_path, device=device, global_mode=True)
+            self.sampler = LocalNeuralExpander11D(
+                env, self.dim, occ_grid_dim, model_path, device=device, global_mode=True
+            )
 
     def neural_expansion_fn(self, v, g):
         start_time = time.time()

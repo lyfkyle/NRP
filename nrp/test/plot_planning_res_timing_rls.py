@@ -21,9 +21,7 @@ planning_time = np.arange(0, 10.1, 0.5)
 for i, planner in enumerate(planners):
     planner_success = []
     for repeat in range(10):
-        with open(
-            osp.join(ROOT_DIR, "test/eval_res/rls/test_time/{}/result_{}.json".format(planner, repeat)), "r"
-        ) as f:
+        with open(osp.join(ROOT_DIR, "results/rls/test_time/{}/result_{}.json".format(planner, repeat)), "r") as f:
             planner_success_tmp = json.load(f)
             planner_success_cnt = planner_success_tmp["success_list"]
             planner_success.append([0] + planner_success_cnt)

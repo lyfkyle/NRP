@@ -1,6 +1,7 @@
 import os
 import os.path as osp
 import matplotlib as mpl
+
 mpl.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -48,9 +49,7 @@ for i, planner in enumerate(planners):
     print(planner)
     planner_success = []
     for repeat in range(args.repeat):
-        with open(
-            osp.join(ROOT_DIR, "test/eval_res/snake_8d/test_time/{}/result_{}.json".format(planner, repeat)), "r"
-        ) as f:
+        with open(osp.join(ROOT_DIR, "results/snake_8d/test_time/{}/result_{}.json".format(planner, repeat)), "r") as f:
             planner_success_tmp = json.load(f)
             planner_success_cnt = (
                 planner_success_tmp["base_success_list"] if i >= 4 else planner_success_tmp["success_list"]
@@ -63,7 +62,9 @@ for i, planner in enumerate(planners):
     planner_success_std = np.std(planner_success_np, axis=0)
     print(planner_success_mean, planner_success_std)
 
-    p = ax1.plot(planning_time, planner_success_mean / 250, "o-", label=legends[i], ms=4, color=utils_8d.c_map[legends[i]])
+    p = ax1.plot(
+        planning_time, planner_success_mean / 250, "o-", label=legends[i], ms=4, color=utils_8d.c_map[legends[i]]
+    )
     ax1.fill_between(
         planning_time,
         (planner_success_mean - planner_success_std) / 250,
@@ -99,14 +100,14 @@ legends = ["NRP*-d", "NRP*-g", "CVAE-IRRT*", "NEXT", "FIRE*", "IRRT*", "BIT*"]
 env_num = 250
 
 for i, planner in enumerate(planners):
-    if not osp.exists(osp.join(ROOT_DIR, f"test/eval_res/fetch_11d/{args.testset}/{planner}")):
+    if not osp.exists(osp.join(ROOT_DIR, f"results/fetch_11d/{args.testset}/{planner}")):
         print(planner, "result does not exist")
         continue
 
     planner_success = []
     for repeat in range(args.repeat):
         with open(
-            osp.join(ROOT_DIR, "test/eval_res/fetch_11d/{}/{}/result_{}.json".format(args.testset, planner, repeat)),
+            osp.join(ROOT_DIR, "results/fetch_11d/{}/{}/result_{}.json".format(args.testset, planner, repeat)),
             "r",
         ) as f:
             planner_success_tmp = json.load(f)

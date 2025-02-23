@@ -3,7 +3,7 @@ import os.path as osp
 import sys
 import json
 
-from nrp.env.fetch_11d.maze import Fetch11DEnv
+from nrp.env.fetch_11d.env import Fetch11DEnv
 from nrp.env.fetch_11d import utils
 from nrp.env.rls import utils as rls_utils
 

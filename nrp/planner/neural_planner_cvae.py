@@ -9,6 +9,7 @@ import numpy as np
 
 from nrp.planner.rrt import RRT
 from nrp.planner.informed_rrt import InformedRRTStar
+from nrp import ROOT_DIR
 
 CUR_DIR = osp.dirname(osp.abspath(__file__))
 
@@ -18,6 +19,7 @@ MAX_NUM_RECUR = 1
 LOCAL_ENV_SIZE = 2
 NUM_OF_SAMPLES = 1
 ADD_INTERMEDIATE_STATE = False
+
 
 class GlobalSampler8D:
     def __init__(self, env, dim, occ_grid_dim, model_path, device):
@@ -161,7 +163,7 @@ class GlobalSampler11D(GlobalSampler8D):
         from env.fetch_11d.fk.model import ProxyFkTorch
 
         linkpos_dim = 24
-        fkmodel_path = osp.join(CUR_DIR, "../env/fetch_11d/fk/models/model_fk.pt")
+        fkmodel_path = osp.join(ROOT_DIR, "models/fetch_11d_approx_fk/model_fk_v2.pt")
         self.fk = ProxyFkTorch(self.robot_dim, linkpos_dim, fkmodel_path, self.device)
 
         # selector

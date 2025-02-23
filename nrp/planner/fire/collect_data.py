@@ -13,7 +13,7 @@ import random
 import networkx as nx
 import torch
 
-from env.fetch_11d.maze import Fetch11DEnv
+from nrp.env.fetch_11d.env import Fetch11DEnv
 
 CUR_DIR = osp.dirname(osp.abspath(__file__))
 

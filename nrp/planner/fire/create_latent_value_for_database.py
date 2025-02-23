@@ -11,7 +11,7 @@ import pickle
 import networkx as nx
 
 # from planner.informed_rrt import InformedRRTStar
-from env.fetch_11d.maze import Fetch11DEnv
+from nrp.env.fetch_11d.env import Fetch11DEnv
 from planner.fire.model import FireModel
 from planner.rrt import RRT
 from planner.fire.fire import Fire, FireEntry

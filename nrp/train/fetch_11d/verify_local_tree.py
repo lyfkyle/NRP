@@ -16,7 +16,7 @@ from tqdm import tqdm
 from collections import defaultdict
 
 from nrp import ROOT_DIR
-from nrp.env.fetch_11d.maze import Fetch11DEnv
+from nrp.env.fetch_11d.env import Fetch11DEnv
 from nrp.env.fetch_11d import utils
 from nrp.env.fetch_11d import prm_utils
 

@@ -1,7 +1,8 @@
 import os.path as osp
 import sys
 import os
-sys.path.insert(0, osp.join(osp.dirname(osp.abspath(__file__)), '../'))
+
+sys.path.insert(0, osp.join(osp.dirname(osp.abspath(__file__)), "../"))
 
 import torch
 import networkx as nx
@@ -24,17 +25,18 @@ PATH_LEN_DIFF_THRESHOLD = 2.0
 
 DISCRIMINATOR = True
 
+
 def plan_using_PRM_2(maze, orig_G, v_pos, g_node):
     G = orig_G.copy()
 
-    free_nodes = [node for node in G.nodes() if not G.nodes[node]['col']]
+    free_nodes = [node for node in G.nodes() if not G.nodes[node]["col"]]
     random.shuffle(free_nodes)
 
     # Add v_node to G
     number_of_nodes = G.number_of_nodes()
     g_pos = utils.node_to_numpy(G, g_node)
     v_node = "n{}".format(number_of_nodes + 1)
-    G.add_node(v_node, coords=','.join(map(str, v_pos)), col=False)
+    G.add_node(v_node, coords=",".join(map(str, v_pos)), col=False)
 
     for node in free_nodes:
         node_pos = utils.node_to_numpy(G, node)
@@ -54,9 +56,10 @@ def plan_using_PRM_2(maze, orig_G, v_pos, g_node):
 
     return G, v_node, node_path, path
 
+
 def sample_problems(G):
     # path = dict(nx.all_pairs_shortest_path(G))
-    free_nodes = [n for n in G.nodes() if not G.nodes[n]['col']]
+    free_nodes = [n for n in G.nodes() if not G.nodes[n]["col"]]
     random.shuffle(free_nodes)
 
     for i, s_name in enumerate(free_nodes):
@@ -76,12 +79,15 @@ def sample_problems(G):
             #     x[0] += 2
             #     x[1] += 2
 
-            if len(path) > 2 and \
-                math.fabs(goal_pos[0] - start_pos[0]) > LOCAL_ENV_SIZE and \
-                math.fabs(goal_pos[1] - start_pos[1]) > LOCAL_ENV_SIZE:
+            if (
+                len(path) > 2
+                and math.fabs(goal_pos[0] - start_pos[0]) > LOCAL_ENV_SIZE
+                and math.fabs(goal_pos[1] - start_pos[1]) > LOCAL_ENV_SIZE
+            ):
                 return s_name, g_name, path
 
     return None, None, []
+
 
 def run_sampler(generator, occ_grid, start_pos, goal_pos, num_of_sample=100):
     with torch.no_grad():
@@ -91,7 +97,7 @@ def run_sampler(generator, occ_grid, start_pos, goal_pos, num_of_sample=100):
         goal = torch.tensor(goal_pos, device=device, dtype=torch.float)
 
         # select
-        tmp = torch.cat((start.view(1, -1), goal.view(1,-1)), dim=0)
+        tmp = torch.cat((start.view(1, -1), goal.view(1, -1)), dim=0)
         all_linkpos = fk.get_link_positions(tmp)
         start_linkpos = all_linkpos[0].view(-1)
         goal_linkpos = all_linkpos[1].view(-1)
@@ -105,6 +111,7 @@ def run_sampler(generator, occ_grid, start_pos, goal_pos, num_of_sample=100):
         samples = samples.cpu().numpy().tolist()
 
     return samples
+
 
 def collect_gt(train_env_dirs, env_idx, env_obj_dict, num_samples_per_env=10):
     maze_dir = train_env_dirs[env_idx]
@@ -134,7 +141,7 @@ def collect_gt(train_env_dirs, env_idx, env_obj_dict, num_samples_per_env=10):
                 break
 
         # sample goal position
-        free_nodes = [node for node in orig_G.nodes() if not orig_G.nodes[node]['col']]
+        free_nodes = [node for node in orig_G.nodes() if not orig_G.nodes[node]["col"]]
         g_node = random.choice(free_nodes)
         goal_pos = utils.node_to_numpy(orig_G, g_node)
 
@@ -152,15 +159,32 @@ def collect_gt(train_env_dirs, env_idx, env_obj_dict, num_samples_per_env=10):
 
         if idx % 10 == 0:
             if DISCRIMINATOR:
-                utils.visualize_nodes_global(occ_grid, v_pos, start_pos, goal_pos, show=False, save=True, file_name=osp.join(CUR_DIR, "eval_res/viz_sampling/{}_{}.png".format(env_idx, idx)))
+                utils.visualize_nodes_global(
+                    occ_grid,
+                    v_pos,
+                    start_pos,
+                    goal_pos,
+                    show=False,
+                    save=True,
+                    file_name=osp.join(CUR_DIR, "results/viz_sampling/{}_{}.png".format(env_idx, idx)),
+                )
             else:
-                utils.visualize_nodes_global(occ_grid, v_pos, start_pos, goal_pos, show=False, save=True, file_name=osp.join(CUR_DIR, "eval_res/viz_sampling/{}_{}.png".format(env_idx, idx)))
+                utils.visualize_nodes_global(
+                    occ_grid,
+                    v_pos,
+                    start_pos,
+                    goal_pos,
+                    show=False,
+                    save=True,
+                    file_name=osp.join(CUR_DIR, "results/viz_sampling/{}_{}.png".format(env_idx, idx)),
+                )
 
         idx += 1
 
     return
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # constants
     model_path = osp.join(CUR_DIR, "../implicit/models/implicit_sel_global.pt")
 
@@ -168,16 +192,16 @@ if __name__ == '__main__':
     env_num = 25
     train_env_dir = osp.join(CUR_DIR, "../dataset/gibson/train")
     train_env_dirs = []
-    for p in Path(train_env_dir).rglob('env_small.obj'):
+    for p in Path(train_env_dir).rglob("env_small.obj"):
         train_env_dirs.append(p.parent)
     assert len(train_env_dirs) == env_num
     test_env_dir = osp.join(CUR_DIR, "../dataset/gibson/mytest")
     test_env_dirs = []
-    for p in Path(test_env_dir).rglob('env_small.obj'):
+    for p in Path(test_env_dir).rglob("env_small.obj"):
         test_env_dirs.append(p.parent)
     assert len(test_env_dirs) == 5
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(device)
 
     z_dim = 5
@@ -223,10 +247,7 @@ if __name__ == '__main__':
     # test_spl /= 100
     # print(test_spl)
 
-    all_res = {
-        "train_spl": train_spl,
-        "test_spl": test_spl
-    }
+    all_res = {"train_spl": train_spl, "test_spl": test_spl}
 
     with open("eval_sampler_res_global.json", "w") as f:
         json.dump(all_res, f)

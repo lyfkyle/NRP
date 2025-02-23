@@ -12,9 +12,6 @@ from nrp.planner.informed_rrt import InformedRRTStar
 from nrp.planner.reeds_shepp_path import ReedsSheppPath
 
 
-
-
-
 class DecomposedRRTPlanner:
     def __init__(self, optimal=False):
         self.log_dir = None

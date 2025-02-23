@@ -50,3 +50,6 @@ eval_env/
 eval_res/
 test_local_tree/
 viz_res*/
+results/
+fire_dataset/
+dataset/

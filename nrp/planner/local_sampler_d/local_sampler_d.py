@@ -192,7 +192,7 @@ class LocalNeuralExpander11D(LocalNeuralExpander8D):
         from nrp.env.fetch_11d.fk.model import ProxyFkTorch
 
         linkpos_dim = 24
-        fkmodel_path = osp.join(ROOT_DIR, "env/fetch_11d/fk/models/model_fk_v2.pt")
+        fkmodel_path = osp.join(ROOT_DIR, "models/fetch_11d_approx_fk/model_fk_v2.pt")
         self.fk = ProxyFkTorch(self.robot_dim, linkpos_dim, fkmodel_path, self.device)
 
         # selector

@@ -13,3 +13,5 @@ tensorboard
 lxml
 pytorch-kinematics
 git+https://github.com/hcarlsso/pyReedsShepp.git
+git+https://github.com/facebookresearch/pytorch3d.git@V0.7.8
+-e .

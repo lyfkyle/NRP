@@ -18,10 +18,7 @@ def convert(planner_success_np):
         if i % 2 == 0:
             res[:, i] = planner_success_np[:, i * 5 // 2]
             if i != res.shape[1] - 1:
-                res[:, i + 1] = (
-                    planner_success_np[:, i * 5 // 2 + 2]
-                    + planner_success_np[:, i * 5 // 2 + 3]
-                ) / 2.0
+                res[:, i + 1] = (planner_success_np[:, i * 5 // 2 + 2] + planner_success_np[:, i * 5 // 2 + 3]) / 2.0
 
     return res
 
@@ -52,18 +49,14 @@ for i, planner in enumerate(planners):
         with open(
             osp.join(
                 ROOT_DIR,
-                "test/eval_res/snake_8d/path_len/test_time/{}/res_{}.json".format(
-                    planner, repeat
-                ),
+                "results/snake_8d/path_len/test_time/{}/res_{}.json".format(planner, repeat),
             ),
             "r",
         ) as f:
             path_cost_tmp = json.load(f)
 
         # path_cost.append([1.0 / (path_cost_tmp[str(j)] + 1e-3) for j in range(len(num_extensions))])
-        path_cost.append(
-            [0] + [path_cost_tmp[str(j)] for j in range(len(orig_planning_time))]
-        )
+        path_cost.append([0] + [path_cost_tmp[str(j)] for j in range(len(orig_planning_time))])
 
     path_cost_np = np.array(path_cost)
     path_cost_mean = np.mean(path_cost_np, axis=0)
@@ -134,18 +127,14 @@ for i, planner in enumerate(planners):
         with open(
             osp.join(
                 ROOT_DIR,
-                "test/eval_res/fetch_11d/path_len/test_time/{}/res_{}.json".format(
-                    planner, repeat
-                ),
+                "results/fetch_11d/path_len/test_time/{}/res_{}.json".format(planner, repeat),
             ),
             "r",
         ) as f:
             path_cost_tmp = json.load(f)
 
         # path_cost.append([1.0 / (path_cost_tmp[str(j)] + 1e-3) for j in range(len(orig_planning_time))])
-        path_cost.append(
-            [0] + [path_cost_tmp[str(j)] for j in range(len(orig_planning_time))]
-        )
+        path_cost.append([0] + [path_cost_tmp[str(j)] for j in range(len(orig_planning_time))])
 
     path_cost_np = np.array(path_cost)
     path_cost_mean = np.mean(path_cost_np, axis=0)

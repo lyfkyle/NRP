@@ -34,18 +34,14 @@ for i, planner in enumerate(planners):
         with open(
             osp.join(
                 ROOT_DIR,
-                "test/eval_res/rls/path_len/test_time/{}/res_{}.json".format(
-                    planner, repeat
-                ),
+                "results/rls/path_len/test_time/{}/res_{}.json".format(planner, repeat),
             ),
             "r",
         ) as f:
             path_cost_tmp = json.load(f)
 
         # path_cost.append([1.0 / (path_cost_tmp[str(j)] + 1e-3) for j in range(len(orig_planning_time))])
-        path_cost.append(
-            [0] + [path_cost_tmp[str(j)] for j in range(len(orig_planning_time))]
-        )
+        path_cost.append([0] + [path_cost_tmp[str(j)] for j in range(len(orig_planning_time))])
 
     path_cost_np = np.array(path_cost)
     path_cost_mean = np.mean(path_cost_np, axis=0)

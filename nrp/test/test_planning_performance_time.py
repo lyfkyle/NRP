@@ -1,33 +1,32 @@
-import os
-import os.path as osp
-import numpy as np
 import argparse
-import torch
 import datetime
 import json
+import os
+import os.path as osp
 from collections import defaultdict
 
-from nrp.env.snake_8d.maze import Snake8DEnv
-from nrp.env.fetch_11d.maze import Fetch11DEnv
-from nrp.planner.bit_star import BITStar
-from nrp.planner.nrp_bit_star import NRPBITStar, NRPBITStarV2
-from nrp.planner.rrt_planner import RRTPlanner
-from nrp.planner.neural_planner_d import NRP_d, NRPGlobal_d
-from nrp.planner.neural_planner_g import NRP_g, NRPGlobal_g
-from nrp.planner.neural_planner_cvae import NeuralPlannerCVAE
-from nrp.planner.neural_planner_fire import NeuralPlannerFire
-from nrp.planner.decomposed_planner import DecomposedRRTPlanner, HybridAStar
-from nrp import ROOT_DIR
+import numpy as np
+import torch
 
-# from planner.vqmpt.vqmpt_rrt_planner import RRT_VQMPT
+from nrp import ROOT_DIR
+from nrp.env.fetch_11d.env import Fetch11DEnv
+from nrp.env.snake_8d.env import Snake8DEnv
+from nrp.planner.bit_star import BITStar
+from nrp.planner.decomposed_planner import DecomposedRRTPlanner, HybridAStar
+from nrp.planner.neural_planner_cvae import NeuralPlannerCVAE
+from nrp.planner.neural_planner_d import NRP_d, NRPGlobal_d
+from nrp.planner.neural_planner_fire import NeuralPlannerFire
+from nrp.planner.fire.fire import Fire, FireEntry
+from nrp.planner.neural_planner_g import NRP_g, NRPGlobal_g
+from nrp.planner.rrt_planner import RRTPlanner
 
 CUR_DIR = osp.dirname(osp.abspath(__file__))
 
 parser = argparse.ArgumentParser(description="Process some integers.")
 parser.add_argument("--name", default="")
-parser.add_argument("--env", default="snake_8d")
+parser.add_argument("--env", default="fetch_11d")
 parser.add_argument("--testset", default="test_env")
-parser.add_argument("--planner", default="rrt_star")
+parser.add_argument("--planner", default="nrp_g")
 parser.add_argument("--logtree", action="store_true")
 parser.add_argument("--drawtree", action="store_true")
 parser.add_argument("--repeat", default=1, type=int)
@@ -37,9 +36,9 @@ LOG_TREE = args.logtree
 now = datetime.datetime.now()
 if args.name == "":
     date_time = now.strftime("%m-%d-%Y-%H-%M-%S")
-    res_dir = osp.join(CUR_DIR, "eval_res/{}/{}".format(args.env, date_time))
+    res_dir = osp.join(ROOT_DIR, "results/{}/{}".format(args.env, date_time))
 else:
-    res_dir = osp.join(CUR_DIR, "eval_res/{}/{}".format(args.env, args.name))
+    res_dir = osp.join(ROOT_DIR, "results/{}/{}".format(args.env, args.name))
 planner_res_dir = osp.join(res_dir, args.planner)
 if not osp.exists(res_dir):
     os.makedirs(res_dir)
@@ -93,7 +92,7 @@ elif args.planner.startswith("bit"):
 elif args.planner.startswith("cvae"):
     neural_goal_bias = 0.4
     uniform_bias = 0.5
-    model_path = osp.join(CUR_DIR, "../planner/cvae/models/{}/cvae_global.pt".format(args.env))
+    model_path = osp.join(ROOT_DIR, "models/cvae/{}/cvae_global.pt".format(args.env))
     cvae_planner = NeuralPlannerCVAE(
         env, model_path, optimal="star" in args.planner, dim=dim, occ_grid_dim=global_occ_grid_dim
     )
@@ -106,7 +105,7 @@ elif args.planner.startswith("nrp_d"):
     sl_bias = 0.1
 
     if "global" in args.planner:
-        model_path = osp.join(ROOT_DIR, "planner/local_sampler_d/models/{}/model_sel_global.pt".format(args.env))
+        model_path = osp.join(ROOT_DIR, "models/nrp_d/{}/nrp_d_global.pt".format(args.env))
         neural_planner_d = NRPGlobal_d(
             env,
             model_path,
@@ -115,7 +114,7 @@ elif args.planner.startswith("nrp_d"):
             occ_grid_dim=global_occ_grid_dim,
         )
     else:
-        model_path = osp.join(ROOT_DIR, "planner/local_sampler_d/models/{}/sampler_d_01_critical_v2.pt".format(args.env))
+        model_path = osp.join(ROOT_DIR, "models/nrp_d/{}/nrp_d_critical.pt".format(args.env))
         neural_planner_d = NRP_d(
             env,
             model_path,
@@ -133,7 +132,7 @@ elif args.planner.startswith("nrp_g"):
     sl_bias = 0.1
 
     if "global" in args.planner:
-        model_path = osp.join(ROOT_DIR, "planner/local_sampler_g/models/{}/cvae_sel_global.pt".format(args.env))
+        model_path = osp.join(ROOT_DIR, "models/nrp_g/{}/nrp_g_global.pt".format(args.env))
         neural_planner_g = NRPGlobal_g(
             env,
             model_path,
@@ -142,7 +141,7 @@ elif args.planner.startswith("nrp_g"):
             occ_grid_dim=global_occ_grid_dim,
         )
     else:
-        model_path = osp.join(ROOT_DIR, "planner/local_sampler_g/models/{}/sampler_g_01_critical_v2.pt".format(args.env))
+        model_path = osp.join(ROOT_DIR, "models/nrp_g/{}/nrp_g_critical.pt".format(args.env))
         neural_planner_g = NRP_g(
             env,
             model_path,
@@ -155,17 +154,15 @@ elif args.planner.startswith("nrp_g"):
     neural_planner_g.algo.add_intermediate_state = False
     neural_planner_g.sl_bias = sl_bias
 
-# BITstar planner
-# elif args.planner.startswith("nrp_bit_g"):
-#     model_path = osp.join(ROOT_DIR, "train/{}/models/sampler_g_01_critical.pt".format(args.env))
-#     bit_planner = NRPBITStarV2(env, model_path, dim=dim, occ_grid_dim=occ_grid_dim, batch_size=20)
 
 elif args.planner.startswith("fire"):
-    model_path = osp.join(CUR_DIR, "../planner/fire/models/fire.pt")
+    assert args.env == "fetch_11d", "Fire only works in fetch_11d"
+    model_path = osp.join(ROOT_DIR, "models/fire/fetch_11d/fire.pt")
     fire_planner = NeuralPlannerFire(env, model_path, optimal="star" in args.planner)
     fire_planner.uniform_bias = 0.2
 
 elif args.planner.startswith("decomposed"):
+    assert args.env == "rls", "decomposed planner only tested in rls"
     decomposed_rrt_planner = DecomposedRRTPlanner(optimal="star" in args.planner)
     decomposed_rrt_planner.algo.goal_bias = 0.1
     hybrid_astar_planner = HybridAStar(br=base_radius, tr=turning_radius, map_res=occ_grid_resolution)
@@ -192,12 +189,10 @@ for repeat in range(num_repeat):
     total_neural_expansion_success = 0
     expansion_success_rate = 0
     total_offline_process_time = 0
-    decoupled_success_list1 = [0] * int(max_time / time_step_size)
-    decoupled_success_list2 = [0] * int(max_time / time_step_size)
 
     for i in range(env_num):
         env.clear_obstacles()
-        env_dir = osp.join(ROOT_DIR, "env/{}/dataset/{}/{}".format(args.env, args.testset, i))
+        env_dir = osp.join(ROOT_DIR, "dataset/{}/{}/{}".format(args.env, args.testset, i))
         occ_grid = utils.get_occ_grid(env_dir)
         mesh_path = utils.get_mesh_path(env_dir)
         print(mesh_path)
@@ -224,25 +219,8 @@ for repeat in range(num_repeat):
             success_res = [tmp[0] for tmp in res]
             path_list = [tmp[1] for tmp in res]
             for idx, p in enumerate(path_list):
-                # if idx == len(path_list) - 1 and len(p) > 0:
-                #     path = utils.interpolate(p)
-                #     utils.visualize_nodes_global(mesh_path, occ_grid, path, env.start, env.goal, show=False, save=True, file_name=osp.join(log_dir, f"planned_path_{repeat}_{idx}.png"))
-
                 with open(osp.join(log_dir, "planned_path_{}_{}.json".format(repeat, idx)), "w") as f:
                     json.dump(p, f)
-
-            if args.drawtree:
-                print("drawing tree")
-                utils.visualize_tree_simple(
-                    occ_grid,
-                    rrt_planner.algo.graph,
-                    start_goal[0],
-                    start_goal[1],
-                    show=False,
-                    save=True,
-                    file_name=osp.join(log_dir, f"planner_tree_{i}.png"),
-                    string=True,
-                )
 
             for idx, res in enumerate(success_res):
                 if res:
@@ -264,23 +242,8 @@ for repeat in range(num_repeat):
             success_res = [tmp[0] for tmp in res]
             path_list = [tmp[1] for tmp in res]
             for idx, p in enumerate(path_list):
-                # path = utils.interpolate(p)
-                # utils.visualize_nodes_global(mesh_path, occ_grid, path, maze.start, maze.goal, show=False, save=True, file_name=osp.join(base_log_dir, "planned_path.png"))
                 with open(osp.join(log_dir, "planned_path_{}_{}.json".format(repeat, idx)), "w") as f:
                     json.dump(p, f)
-
-            if args.drawtree:
-                print("drawing tree")
-                utils.visualize_tree_simple(
-                    occ_grid,
-                    bit_planner.graph,
-                    start_goal[0],
-                    start_goal[1],
-                    show=False,
-                    save=True,
-                    file_name=osp.join(log_dir, f"planner_tree_{i}.png"),
-                    string=True,
-                )
 
             for idx, res in enumerate(success_res):
                 if res:
@@ -304,8 +267,6 @@ for repeat in range(num_repeat):
             success_res = [tmp[0] for tmp in res]
             path_list = [tmp[1] for tmp in res]
             for idx, p in enumerate(path_list):
-                # path = utils.interpolate(p)
-                # utils.visualize_nodes_global(mesh_path, occ_grid, path, maze.start, maze.goal, show=False, save=True, file_name=osp.join(base_log_dir, "planned_path.png"))
                 with open(osp.join(log_dir, "planned_path_{}_{}.json".format(repeat, idx)), "w") as f:
                     json.dump(p, f)
 
@@ -331,8 +292,6 @@ for repeat in range(num_repeat):
             success_res = [tmp[0] for tmp in res]
             path_list = [tmp[1] for tmp in res]
             for idx, p in enumerate(path_list):
-                # path = utils.interpolate(p)
-                # utils.visualize_nodes_global(mesh_path, occ_grid, path, maze.start, maze.goal, show=False, save=True, file_name=osp.join(base_log_dir, "planned_path.png"))
                 with open(osp.join(log_dir, "planned_path_{}_{}.json".format(repeat, idx)), "w") as f:
                     json.dump(p, f)
 
@@ -380,8 +339,6 @@ for repeat in range(num_repeat):
             success_res = [tmp[0] for tmp in res]
             path_list = [tmp[1] for tmp in res]
             for idx, p in enumerate(path_list):
-                # path = utils.interpolate(p)
-                # utils.visualize_nodes_global(mesh_path, occ_grid, path, maze.start, maze.goal, show=False, save=True, file_name=osp.join(base_log_dir, "planned_path.png"))
                 with open(osp.join(log_dir, "planned_path_{}_{}.json".format(repeat, idx)), "w") as f:
                     json.dump(p, f)
 
@@ -413,29 +370,13 @@ for repeat in range(num_repeat):
             success_res = [tmp[0] for tmp in res]
             path_list = [tmp[1] for tmp in res]
             for idx, p in enumerate(path_list):
-                # path = utils.interpolate(p)
-                # utils.visualize_nodes_global(mesh_path, occ_grid, path, maze.start, maze.goal, show=False, save=True, file_name=osp.join(base_log_dir, "planned_path.png"))
                 with open(osp.join(log_dir, "planned_path_{}_{}.json".format(repeat, idx)), "w") as f:
                     json.dump(p, f)
-
-            if args.drawtree and not success_res[-1]:
-                print("drawing tree")
-                utils.visualize_tree_simple(
-                    occ_grid,
-                    neural_planner_g.algo.graph,
-                    start_goal[0],
-                    start_goal[1],
-                    show=False,
-                    save=True,
-                    file_name=osp.join(log_dir, f"planner_tree_{i}.png"),
-                    string=True,
-                )
 
             for idx, res in enumerate(success_res):
                 if res:
                     success_list[idx] += 1
                     success_list_by_env[int(i / 50)][idx] += 1
-            # print(neural_planner_g.neural_expand_cnt)
 
             total_loop_time += neural_planner_g.algo.total_running_time / (neural_planner_g.algo.num_expansions + 1e-8)
             total_neural_expansion_time += neural_planner_g.neural_expansion_time / (
@@ -529,13 +470,6 @@ for repeat in range(num_repeat):
             for idx, res in enumerate(success_res):
                 if res:
                     success_list[idx] += 1
-
-            for idx, res in enumerate(success_res1):
-                if res:
-                    decoupled_success_list1[idx] += 1
-            for idx, res in enumerate(success_res2):
-                if res:
-                    decoupled_success_list2[idx] += 1
 
         print("success_list", success_list)
 

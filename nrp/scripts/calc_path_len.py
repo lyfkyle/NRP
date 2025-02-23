@@ -6,8 +6,8 @@ import argparse
 import networkx as nx
 import torch.multiprocessing as mp
 
-from nrp.env.fetch_11d.maze import Fetch11DEnv
-from nrp.env.snake_8d.maze import Snake8DEnv
+from nrp.env.fetch_11d.env import Fetch11DEnv
+from nrp.env.snake_8d.env import Snake8DEnv
 from nrp.env.rls.rls_env import RLSEnv
 from nrp import ROOT_DIR
 # import utils
@@ -34,8 +34,8 @@ elif args.env == "rls":
     env_num = 10
     process_num = 10
 
-res_dir = osp.join(ROOT_DIR, "test/eval_res/{}/{}/{}".format(args.env, args.name, args.planner))
-viz_res_dir = osp.join(ROOT_DIR, "test/eval_res/{}/path_len/{}/{}".format(args.env, args.name, args.planner))
+res_dir = osp.join(ROOT_DIR, "results/{}/{}/{}".format(args.env, args.name, args.planner))
+viz_res_dir = osp.join(ROOT_DIR, "results/{}/path_len/{}/{}".format(args.env, args.name, args.planner))
 if not os.path.exists(viz_res_dir):
     os.makedirs(viz_res_dir)
 

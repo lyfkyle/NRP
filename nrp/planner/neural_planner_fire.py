@@ -12,16 +12,18 @@ from nrp.planner.informed_rrt import InformedRRTStar
 from nrp.planner.fire.model import FireModel
 from nrp.planner.rrt import RRT
 from nrp.planner.fire.fire import Fire
+from nrp import ROOT_DIR
 
 CUR_DIR = osp.dirname(osp.abspath(__file__))
 
-DATA_DIR = osp.join(CUR_DIR, "fire/dataset/fire_database")
+DATA_DIR = osp.join(ROOT_DIR, "fire_dataset/fire_database")
 
 DEBUG = True
 
 
 SIGMA = 0.2
 ADD_INTERMEDIATE_STATE = False
+
 
 class FireSampler:
     def __init__(self, env, dim, occ_grid_dim, model_path, device):

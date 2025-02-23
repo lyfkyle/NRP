@@ -27,7 +27,7 @@ class MyDataset(Dataset):
         self.device = device
         self.dataset_size = dataset_size
 
-        fkmodel_path = osp.join(ROOT_DIR, "env/fetch_11d/fk/models/model_fk_v2.pt")
+        fkmodel_path = osp.join(ROOT_DIR, "models/fetch_11d_approx_fk/model_fk_v2.pt")
         self.fk = ProxyFkTorch(robot_dim, linkpos_dim, fkmodel_path, device)
         self._data_dir = data_dir
 

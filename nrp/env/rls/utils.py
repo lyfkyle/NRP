@@ -571,7 +571,7 @@ def visualize_nodes_global(
     edge_path=None,
     gui=False,
 ):
-    from nrp.env.fetch_11d.maze import Fetch11DEnv
+    from nrp.env.fetch_11d.env import Fetch11DEnv
 
     env = Fetch11DEnv(gui=gui, add_robot=False)
     if mesh is not None:
@@ -643,7 +643,7 @@ def visualize_nodes_global_2(
     save=False,
     file_name=None,
 ):
-    from env.fetch_11d.maze import Fetch11DEnv
+    from nrp.env.fetch_11d.env import Fetch11DEnv
 
     # Image from side.
     maze = Fetch11DEnv(gui=False, add_robot=False, load_floor=True)
@@ -693,7 +693,7 @@ def visualize_nodes_local(
     save=False,
     file_name=None,
 ):
-    from env.fetch_11d.maze import Fetch11DEnv
+    from nrp.env.fetch_11d.env import Fetch11DEnv
 
     maze = Fetch11DEnv(gui=False, add_robot=False)
     # maze.disable_visual()
@@ -858,7 +858,7 @@ def visualize_tree(
     file_name=None,
     string=False,
 ):
-    from env.fetch_11d.maze import Fetch11DEnv
+    from nrp.env.fetch_11d.env import Fetch11DEnv
 
     maze = Fetch11DEnv(gui=False, add_robot=False)
     if mesh is not None:

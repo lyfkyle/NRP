@@ -28,17 +28,17 @@ by learning local sampling distributions.
 
 If you find this work useful or interesting, please kindly give us a star ⭐, thanks!😀
 
-# Installation
+## Installation
 
 Install system dependencies first.
 
-```
+```bash
 sudo apt-get install libboost-all-dev
 ```
 
 Download prebuild python wheel for OMPL
 
-```
+```bash
 wget https://github.com/ompl/ompl/releases/download/prerelease/ompl-1.6.0-cp310-cp310-manylinux_2_28_x86_64.whl
 pip install ompl-1.6.0-cp310-cp310-manylinux_2_28_x86_64.whl
 ```
@@ -46,20 +46,13 @@ pip install ompl-1.6.0-cp310-cp310-manylinux_2_28_x86_64.whl
 Create conda environment with python 3.8
 
 ```bash
-conda install pytorch torchvision pytorch-cuda -c pytorch -c nvidia
-conda install pytorch3d -c pytorch3d
+conda install pytorch==2.4.0 torchvision pytorch-cuda -c pytorch -c nvidia
 pip install -r requirements.txt
-```
-
-## Download pre-built ompl binary
-
-```
-
 ```
 
 ## Download models
 
-# Run experiments
+## Run experiments
 
 ## Test on a single problem
 
